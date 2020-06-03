@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>TwitterAnalysis</title>
+    <script>
+        function myFunction() {
+                 document.getElementById("myForm").reset();
+                               }
+    </script>
 </head>
 <body>
     <h2>Twitter Analysis Report </h2>
@@ -17,6 +22,7 @@
         Enter EndDate<input type="date" name="EndDate" >
         <br>
         <input type="submit">
+        <input type="button" onclick="myFunction()" value="Reset form">
     </form>
 </body>
 </html>
