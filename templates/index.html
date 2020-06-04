@@ -1,28 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+    body {
+    text-align: center;
+        }
+    label {
+        padding: 10px 10px 10px 0;
+        display: inline-block;
+    }
+    input[type=submit] {
+    width: 10%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    }
+    input[type=button] {
+        width: 10%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }align="center"
+    
+    div {
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+    
+    </style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>TwitterAnalysis</title>
+    <ttle></ttle>
     <script>
         function myFunction() {
                  document.getElementById("myForm").reset();
                                }
     </script>
 </head>
+
 <body>
-    <h2>Twitter Analysis Report </h2>
-    <form id="myForm" action = "https://twitteranalysisreport.herokuapp.com/get_report" method = "POST" 
-         enctype = "multipart/form-data">
-        Enter ScreenName : <input type="text" name = "ScreenName">
-        <br> 
-        Enter StartDate<input type="date" name="StartDate" >
-        <br>
-        Enter EndDate<input type="date" name="EndDate" >
-        <br>
-        <input type="submit">
-        <input type="button" onclick="myFunction()" value="Reset form">
-    </form>
+    
+    <div>
+        <h2>Twitter Analysis Report</h2>
+        <form id="myForm" action = "https://twitteranalysisreport.herokuapp.com/get_report" method = "POST" 
+            enctype = "multipart/form-data">
+            <label for="sname">ScreenName</label>
+            <input type="text" id="sname" name="ScreenName" placeholder="ScreenName(ex: narendramodi) ">
+            <!-- <input type="text" name = "ScreenName"> -->
+            <br> 
+            <label for="sdate">StartDate</label>
+            <input type="date" name="StartDate" id="sdate">
+            <br>
+            <label for="edate">EndDate</label>
+            <input type="date" name="EndDate" id="edate">
+            <br>
+            <input type="submit"  value="Submit">
+            <input type="button" onclick="myFunction()" value="Reset form">
+        </form>
+    </div>
+    
 </body>
 </html>
