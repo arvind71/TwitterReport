@@ -29,16 +29,30 @@ access_token_secret = 't6xsXYQEVXMO6HfOvB81sOWIWBPPEaXDvHT76tsnnO74q'
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth,wait_on_rate_limit=True)
-
-PEOPLE_FOLDER = os.path.join('static', 'report')
+#MYDIR = os.path.dirname(__file__)
+#PEOPLE_FOLDER = os.path.join('static', 'report')
 app = flask.Flask(__name__)
-app.config['UPLOAD_FOLDER'] = PEOPLE_FOLDER
-
+#app.config['UPLOAD_FOLDER'] = PEOPLE_FOLDER
+#img_path =os.path.join(MYDIR + "/" + app.config['UPLOAD_FOLDER'])
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    
+    return r
 @app.route("/")
 def mypage():
     return flask.render_template('index.html')
 @app.route("/get_report",methods = ['POST'])
 def report():
+    #PEOPLE_FOLDER = os.path.join('static', 'report')
+    #app.config['UPLOAD_FOLDER'] = PEOPLE_FOLDER
     # username = "narendramodi"
     # startDate = datetime.datetime(2020, 2, 25, 0, 0, 0)
     # endDate =   datetime.datetime(2020, 5, 6, 0, 0, 0)
@@ -166,7 +180,7 @@ def report():
     plt.imshow(wordCloud,interpolation = "bilinear")
     plt.axis("off")
     plt.savefig("./static/report/Wordcloud.png")
-    full_filename1 = os.path.join(app.config['UPLOAD_FOLDER'], 'Wordcloud.png')
+    #full_filename1 = os.path.join(app.config['UPLOAD_FOLDER'], 'Wordcloud.png')
     
     plt.figure(figsize=(12,5))
     sns.set(rc={"axes.facecolor":"#283747", "axes.grid":False,'xtick.labelsize':14,'ytick.labelsize':14,},font='Liberation Serif')
@@ -175,24 +189,25 @@ def report():
 
     plt.savefig("./static/report/Bargraph.png",bbox_inches = 'tight')
     #plt.savefig("output.png")
-    full_filename2 = os.path.join(app.config['UPLOAD_FOLDER'], 'Bargraph.png')
+    #full_filename2 = os.path.join(app.config['UPLOAD_FOLDER'], 'Bargraph.png')
     
     
     # sns.set(rc={"axes.facecolor":"#283747"},font='Liberation Serif')
 
     #fig1 = plt.gcf()
     #fig = plt.figure(figsize=(8,6))
-    df.groupby('Sentiment').Tweets.count().plot.pie(figsize=(8,8),
-                                                    title = 'Sentiments PieChart',
-                                                    explode=[0, 0, 0.05],colors = ['maroon','orange','green'],
-                                                    shadow=True,
-                                                )
+    df.groupby('Sentiment').Tweets.count().plot.pie(figsize=(8,8),autopct="%1.1f%%",
+                                                title = 'Sentiments PieChart',
+                                                explode=[0, 0, 0.05],colors = ['maroon','orange','green'],
+                                                shadow=True,
+                                               )
+                                                
     plt.legend()
     #plt.show()
     plt.draw()
     plt.savefig("./static/report/Piechart.png",
                 bbox_inches = 'tight')
-    full_filename3 = os.path.join(app.config['UPLOAD_FOLDER'], 'Piechart.png')
+    #full_filename3 = os.path.join(app.config['UPLOAD_FOLDER'], 'Piechart.png')
     
     df1 = df[df['retweeted']=='NO']
     df1['date'] = df1['created_at'].dt.date
@@ -214,10 +229,13 @@ def report():
     plt.draw()
     fig.tight_layout()
     plt.savefig("./static/report/Linechart.png")
-    full_filename4 = os.path.join(app.config['UPLOAD_FOLDER'], 'Linechart.png')
-    
-    return flask.render_template('report.html',user_image1 = full_filename1,user_image2 = full_filename2,
-                                  user_image3 = full_filename3, user_image4 = full_filename4)
+    #full_filename4 = os.path.join(app.config['UPLOAD_FOLDER'], 'Linechart.png')
+    url1 = "/static/report/Wordcloud.png"
+    url2 = "/static/report/Bargraph.png"
+    url3 = "/static/report/Piechart.png"
+    url4 = "/static/report/Linechart.png"
+    return flask.render_template('report.html',user_image1 = url1,user_image2 = url2,
+                                  user_image3 = url3, user_image4 = url4)
 if __name__ == "__main__":
    
     app.run(debug = True)
