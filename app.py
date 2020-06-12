@@ -9,7 +9,7 @@ import datetime
 import time 
 import flask
 import pickle
-import os
+import os, shutil
 
 import seaborn as sns
     
@@ -51,12 +51,24 @@ def mypage():
     return flask.render_template('index.html')
 @app.route("/get_report",methods = ['POST'])
 def report():
+
+    folder = './static/report'
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
     #PEOPLE_FOLDER = os.path.join('static', 'report')
     #app.config['UPLOAD_FOLDER'] = PEOPLE_FOLDER
     # username = "narendramodi"
     # startDate = datetime.datetime(2020, 2, 25, 0, 0, 0)
     # endDate =   datetime.datetime(2020, 5, 6, 0, 0, 0)
     #input_name = flask.request.form['u']
+    
     username = flask.request.form['ScreenName']
     print(username)
     startDate = flask.request.form['StartDate']
@@ -65,6 +77,8 @@ def report():
 
     endDate = flask.request.form['EndDate']
     endDate = datetime.datetime.strptime(endDate,'%Y-%m-%d')
+    endDate = endDate + datetime.timedelta(days=1)
+    datetime.datetime.strftime(endDate, "%Y/%m/%d")
 
     print(endDate)
 
@@ -81,7 +95,7 @@ def report():
     tmpTweets = api.user_timeline(username,tweet_mode="extended",exclude_replies=True,trim_user = True)
     # print(tmpTweets[7])
     for tweet in tmpTweets:
-        if tweet.created_at < endDate and tweet.created_at > startDate:
+        if tweet.created_at <= endDate and tweet.created_at >= startDate:
             if (tweet.full_text[:2] == 'RT'):
                 tweets.append(tweet.full_text)
                 created_at.append(tweet.created_at)
@@ -106,7 +120,7 @@ def report():
     while (tmpTweets[-1].created_at > startDate):
         tmpTweets = api.user_timeline(username, max_id = tmpTweets[-1].id,tweet_mode="extended",exclude_replies=True,trim_user = True)
         for tweet in tmpTweets:
-            if tweet.created_at < endDate and tweet.created_at > startDate:
+            if tweet.created_at <= endDate and tweet.created_at >= startDate:
                 if (tweet.full_text[:2] == 'RT'):
                     tweets.append(tweet.full_text)
                     created_at.append(tweet.created_at)
@@ -185,7 +199,7 @@ def report():
     plt.figure(figsize=(12,5))
     sns.set(rc={"axes.facecolor":"#283747", "axes.grid":False,'xtick.labelsize':14,'ytick.labelsize':14,},font='Liberation Serif')
     #sns.set(style="darkgrid",palette='deep',font='Liberation Serif')
-    ax = sns.countplot(y="Intent", data=df,palette="Set1")
+    ax = sns.countplot(y="Intent", data = df,palette="Set1")
 
     plt.savefig("./static/report/Bargraph.png",bbox_inches = 'tight')
     #plt.savefig("output.png")
@@ -195,18 +209,33 @@ def report():
     # sns.set(rc={"axes.facecolor":"#283747"},font='Liberation Serif')
 
     #fig1 = plt.gcf()
-    #fig = plt.figure(figsize=(8,6))
-    df.groupby('Sentiment').Tweets.count().plot.pie(figsize=(8,8),autopct="%1.1f%%",
-                                                title = 'Sentiments PieChart',
-                                                explode=[0, 0, 0.05],colors = ['maroon','orange','green'],
-                                                shadow=True,
-                                               )
-                                                
-    plt.legend()
-    #plt.show()
-    plt.draw()
-    plt.savefig("./static/report/Piechart.png",
-                bbox_inches = 'tight')
+    try:
+        fig = plt.figure(figsize=(8,6))
+        df.groupby('Sentiment').Tweets.count().plot.pie(figsize=(8,8),autopct="%1.1f%%",
+                                                    title = 'Sentiments PieChart',
+                                                    explode=[0.05, 0.05, 0.05],colors = ['maroon','orange','green'],
+                                                    shadow=True,
+                                                )
+                                                    
+        plt.legend()
+        #plt.show()
+        plt.draw()
+        fig.savefig("./static/report/Piechart.png",
+                    bbox_inches = 'tight')
+    except ValueError :
+        fig = plt.figure(figsize=(8,6))
+        df.groupby('Sentiment').Tweets.count().plot.pie(figsize=(8,8),autopct="%1.1f%%",
+                                                    title = 'Sentiments PieChart',
+                                                    colors = ['maroon','orange','green'],
+                                                    shadow=True,
+                                                )
+                                                    
+        plt.legend()
+        #plt.show()
+        plt.draw()
+        fig.savefig("./static/report/Piechart.png",
+                    bbox_inches = 'tight')
+
     #full_filename3 = os.path.join(app.config['UPLOAD_FOLDER'], 'Piechart.png')
     
     df1 = df[df['retweeted']=='NO']
